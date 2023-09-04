@@ -1,0 +1,30 @@
+{
+  "name": "vitepress-blog",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "repository": "https://github.com/imingz/vitepress-blog.git",
+  "author": "imimgz <imingz@qq.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@mdit-vue/shared": "^0.12.0",
+    "@types/markdown-it-footnote": "^3.0.0",
+    "@types/node": "^20.4.9",
+    "@vercel/analytics": "^1.0.2",
+    "axios": "^1.4.0",
+    "element-plus": "^2.3.9",
+    "fast-glob": "^3.3.1",
+    "gray-matter": "^4.0.3",
+    "markdown-it-custom-attrs": "^1.0.2",
+    "markdown-it-footnote": "^3.0.3",
+    "markdown-it-katex": "^2.0.3",
+    "markdown-it-task-lists": "^2.1.1",
+    "sass": "^1.65.1",
+    "vitepress": "^1.0.0-rc.10"
+  },
+  "scripts": {
+    "dev": "vitepress dev docs",
+    "build": "vitepress build docs",
+    "preview": "vitepress preview docs"
+  }
+}

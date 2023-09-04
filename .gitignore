@@ -1,0 +1,7 @@
+node_modules/
+docs/.vitepress/dist
+docs/.vitepress/cache
+.obsidian/
+_obsidian/
+yarn-error.log
+docs/test
