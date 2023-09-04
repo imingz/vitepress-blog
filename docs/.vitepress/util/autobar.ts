@@ -79,10 +79,14 @@ function autoSideBar(rootDir: string, dirPath: string) {
           param.pid = dirPath;
         }
       }
-      const { data } = matter(
-        readFileSync(`${rootDir}${dirPath}${selfPath}`, "utf-8")
-      );
-      param.tags = data.tags;
+
+      const file = `${rootDir}${dirPath}${selfPath}`;
+
+      if (file.endsWith(".md")) {
+        const { data } = matter(readFileSync(file, "utf-8"));
+        param.tags = data.tags;
+      }
+
       obj[selfPath] = param;
     });
   });
@@ -200,11 +204,12 @@ function setNavBar(rootDir: string) {
 
 // 自动生成
 function generateAutoBar(rootDir: string) {
-  let sideBar = setSideBar(rootDir);
-  let navBar = setNavBar(rootDir);
+  const navBar = setNavBar(rootDir);
+  const sideBar = setSideBar(rootDir);
+
   return {
-    sideBar,
     navBar,
+    sideBar,
   };
 }
 
