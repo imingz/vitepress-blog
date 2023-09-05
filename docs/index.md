@@ -20,7 +20,7 @@ hero:
   actions:
     - theme: brand
       text: Let's Go 🐈‍⬛
-      link: /1-刷题/1-LeetCode/1-1.两数之和
+      link: /tags
     - theme: alt
       text: Github
       link: www.github.com/imingz
@@ -29,12 +29,12 @@ features:
   - icon: ✏️
     title: 学习笔记
     details: 我将与你分享我在不同领域的学习心得和经验。学习是我生活中不可或缺的一部分。
-    link: /1-刷题/1-LeetCode/1-1.两数之和
+    link: /1-学习笔记/1-go/2-异常处理 Error/1-Error VS Exception.md
     linkText: 😻 Go
   - icon: 📖
     title: 其他笔记
     details: 希望我的博客能够为你提供有价值的内容和启示。
-    link: /9-others/1-vitepress/6-自动导航
+    link: docs/9-其他/1-网页/1-vitepress/6-自动导航.md
     linkText: 😸 Go
   - icon: 🔍
     title: 标签搜索
