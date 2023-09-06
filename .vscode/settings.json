@@ -11,11 +11,13 @@
     "hitokoto",
     "katex",
     "manageddevices",
+    "myapp",
     "nolint",
     "simpledriver",
     "Sprintf",
     "staticcheck",
     "vitepress",
+    "xxapi",
     "yidocs"
   ]
 }
