@@ -4,6 +4,7 @@ import DefaultTheme from "vitepress/theme";
 
 import NavBarTitleBefore from "./components/NavBarTitleBefore.vue";
 import Tags from "./components/Tags.vue";
+import Share from "./components/share.vue";
 
 import "./styles/index.scss";
 
@@ -51,6 +52,7 @@ export default {
        */
       "nav-bar-title-before": () => h(NavBarTitleBefore),
       "doc-before": () => h(Tags),
+      "nav-bar-content-after": () => h(Share),
     });
   },
   enhanceApp({ app, router }: EnhanceAppContext) {
