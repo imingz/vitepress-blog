@@ -2,27 +2,12 @@
   <div @click="openShare">
     <Share class="share" />
   </div>
-  <el-dialog
-    v-model="dialogVisible"
-    title="分享链接"
-    width="30%"
-    draggable
-    close-on-press-escape>
-    <span>{{ sUrl }}</span>
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button color="var(--vp-c-tip-3)" @click="dialogVisible = false">
-          关闭
-        </el-button>
-      </span>
-    </template>
-  </el-dialog>
 </template>
 
 <script lang="ts" setup>
 import { computed, ref } from "vue";
 import { useRoute } from "vitepress";
-import { ElButton, ElDialog, ElNotification } from "element-plus";
+import { ElNotification } from "element-plus";
 import axios from "axios";
 import Share from "./svg/Share.vue";
 
@@ -35,7 +20,6 @@ const url = computed(() => {
   return protocol + host + path;
 });
 
-const dialogVisible = ref(false);
 const sUrl = ref("");
 
 const openShare = async () => {
@@ -72,10 +56,10 @@ function copyToClipboard(text: string): Promise<void> {
     })
     .catch(() => {
       ElNotification({
-        message: "复制链接到剪贴板失败，请手动复制。",
+        duration: 10000,
+        message: "复制链接到剪贴板失败，请手动复制: " + text,
         type: "warning",
       });
-      dialogVisible.value = true;
     });
 }
 </script>
@@ -84,9 +68,8 @@ function copyToClipboard(text: string): Promise<void> {
 .share {
   width: 1.3em;
   height: 1.3em;
-  margin-left: 1em;
-  @media (max-width: 767px) {
-    margin: 0;
+  @media (min-width: 767px) {
+    margin-left: 1em;
   }
   &:hover {
     color: var(--vp-c-brand-1);
