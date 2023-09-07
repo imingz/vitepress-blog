@@ -26,7 +26,7 @@ import { ElButton, ElDialog, ElNotification } from "element-plus";
 import axios from "axios";
 import Share from "./svg/Share.vue";
 
-const protocol = "http://"; // window.location.protocol + "//";
+const protocol = "https://"; // window.location.protocol + "//";
 const host = "imingz.fun"; //window.location.host;
 const route = useRoute();
 
@@ -40,7 +40,7 @@ const sUrl = ref("");
 
 const openShare = async () => {
   await axios
-    .get("http://a.imingz.fun/shortLink?url=" + url.value, { timeout: 5000 })
+    .get("https://a.imingz.fun/shortLink?url=" + url.value, { timeout: 5000 })
     .then((response) => {
       sUrl.value = response.data;
       copyToClipboard(sUrl.value);
@@ -59,8 +59,6 @@ const openShare = async () => {
         });
       }
     });
-
-  dialogVisible.value = true;
 };
 
 function copyToClipboard(text: string): Promise<void> {
@@ -77,6 +75,7 @@ function copyToClipboard(text: string): Promise<void> {
         message: "复制链接到剪贴板失败，请手动复制。",
         type: "warning",
       });
+      dialogVisible.value = true;
     });
 }
 </script>
