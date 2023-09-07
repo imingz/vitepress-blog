@@ -53,9 +53,6 @@ const copyToClipboard = (text: string): Promise<void> => {
       });
     });
 };
-
-// todo: 动态切换
-const isDark = document.querySelectorAll(".dark").length > 0;
 </script>
 
 <template>
@@ -65,15 +62,8 @@ const isDark = document.querySelectorAll(".dark").length > 0;
         <el-input v-model="form.oUrl" placeholder="源网址" />
       </el-form-item>
       <el-form-item>
-        <el-button plain round color="#626aef" @click="shortURL" :dark="isDark">
-          生成
-        </el-button>
-        <el-button
-          plain
-          round
-          color="#626aef"
-          :dark="isDark"
-          @click="copyToClipboard(form.sUrl)">
+        <el-button plain round text @click="shortURL"> 生成 </el-button>
+        <el-button plain round text @click="copyToClipboard(form.sUrl)">
           复制
         </el-button>
       </el-form-item>
