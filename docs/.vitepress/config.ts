@@ -121,14 +121,14 @@ export default defineConfig({
       },
     ],
     // algolia 加速
-    [
-      "link",
-      {
-        rel: "preconnect",
-        href: `https://${process.env.ALGOLIA_APP_ID}-dsn.algolia.net`,
-        crossorigin: "",
-      },
-    ],
+    // [
+    //   "link",
+    //   {
+    //     rel: "preconnect",
+    //     href: `https://${process.env.ALGOLIA_APP_ID}-dsn.algolia.net`,
+    //     crossorigin: "",
+    //   },
+    // ],
   ],
   // 上次更新时间
   lastUpdated: true,
@@ -205,8 +205,8 @@ export default defineConfig({
 
     // 搜索
     search: {
-      provider: "algolia",
-      options: algoliaSearchOptions,
+      provider: "local",
+      options: localSearchOptions,
     },
   },
   vue: {
