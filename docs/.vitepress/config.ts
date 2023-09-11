@@ -158,7 +158,7 @@ export default defineConfig({
       },
       {
         text: "日志",
-        // link: "/logs",
+        link: "/logs",
       },
     ],
 

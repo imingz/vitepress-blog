@@ -44,6 +44,6 @@ features:
   - icon: 🗒️
     title: todo：日志
     details: 按照年月日的时间线记录每次的更新。您可以了解到博客的最新动态，了解每次更新的具体内容、时间。
-    link:
+    link: /logs
     linkText: 😽
 ---
