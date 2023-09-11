@@ -27,6 +27,7 @@
     "manageddevices",
     "myapp",
     "nolint",
+    "ratelimit",
     "remotecache",
     "Replicaset",
     "simpledriver",
