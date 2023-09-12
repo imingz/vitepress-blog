@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { reactive } from "vue";
+import { useData } from "vitepress";
 import {
   ElInput,
   ElForm,
@@ -8,6 +9,8 @@ import {
   ElNotification,
 } from "element-plus";
 import axios from "axios";
+
+const { isDark } = useData();
 
 const form = reactive({
   oUrl: "",
@@ -62,8 +65,20 @@ const copyToClipboard = (text: string): Promise<void> => {
         <el-input v-model="form.oUrl" placeholder="源网址" />
       </el-form-item>
       <el-form-item>
-        <el-button plain round text @click="shortURL"> 生成 </el-button>
-        <el-button plain round text @click="copyToClipboard(form.sUrl)">
+        <el-button
+          plain
+          round
+          color="var(--vp-c-brand-1)"
+          :dark="isDark"
+          @click="shortURL">
+          生成
+        </el-button>
+        <el-button
+          plain
+          round
+          color="var(--vp-c-brand-1)"
+          :dark="isDark"
+          @click="copyToClipboard(form.sUrl)">
           复制
         </el-button>
       </el-form-item>
