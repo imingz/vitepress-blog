@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, Ref, watch, onMounted } from "vue";
 import { ElTable, ElTableColumn, ElSelect, ElOption } from "element-plus";
-import { getFlatList, getUrlParam } from "../../utils/common";
+import { getFlatList, getUrlParam } from "./utils/common";
 
 // 获取文章列表和标签列表
 const list = getFlatList();
@@ -53,15 +53,21 @@ watch(tagsValue, (newVal, oldVal) => {
 
     <!-- 相关文章列表 -->
     <el-table :data="relList" stripe style="width: 100%">
+      <el-table-column prop="tags" label="标签" sortable width="180" />
       <el-table-column prop="text" label="标题" sortable width="180" />
       <el-table-column prop="link" label="链接" width="180">
         <template #default="{ row }">
           <a :href="row.link" class="tag-link">{{
-            row.link.replace(/[0-9]+-/g, "")
+            row.link
+              .replace(/[0-9]+-/g, "")
+              .replace("/", "")
+              .split("/")
+              .reverse()
+              .slice(1)
+              .join(" <-- ")
           }}</a>
         </template>
       </el-table-column>
-      <el-table-column prop="tags" label="标签" sortable width="180" />
     </el-table>
   </div>
 </template>
@@ -80,3 +86,4 @@ watch(tagsValue, (newVal, oldVal) => {
   }
 }
 </style>
+./utils/common

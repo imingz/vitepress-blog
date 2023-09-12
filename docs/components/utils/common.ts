@@ -12,10 +12,12 @@ export const getFlatList = () => {
           link: item.link.replace(/\.md$/, ""),
           text: item.text,
           tags: item.tags,
+          lastUpdated: new Date(item.lastUpdated),
         });
       });
     }
   });
+
   return list;
 };
 

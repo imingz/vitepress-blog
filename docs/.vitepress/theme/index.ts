@@ -6,6 +6,10 @@ import NavBarTitleBefore from "./components/NavBarTitleBefore.vue";
 import Tags from "./components/Tags.vue";
 import Share from "./components/share.vue";
 
+import ElementPlus from "element-plus";
+import zhCn from "element-plus/dist/locale/zh-cn.mjs";
+import "dayjs/locale/zh-cn";
+
 import "./styles/index.scss";
 
 if (typeof window !== "undefined") {
@@ -65,6 +69,7 @@ export default {
         { immediate: true }
       );
     }
+    app.use(ElementPlus, { locale: zhCn });
   },
 };
 

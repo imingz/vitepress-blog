@@ -2,7 +2,9 @@
 import fg from "fast-glob";
 import { orderBy, cloneDeep } from "lodash-es";
 import { existsSync, readFileSync, readdirSync } from "fs";
+import { execSync } from "child_process";
 import matter from "gray-matter";
+import path from "path";
 
 /**
  * 一维数组生成无限级树结构
@@ -42,11 +44,25 @@ function array2Tree(arrays, id = "id", pid = "pid", children = "children") {
   return treeData;
 }
 
+function getGitCommitTime(filePath: string): string {
+  filePath = path.resolve(__dirname, "../../..") + "/" + filePath;
+  try {
+    const command = `git log -n 1 --pretty=format:%ad -- '${filePath}'`;
+    const output = execSync(command).toString().trim();
+    return output;
+  } catch (error) {
+    console.error("Error retrieving Git commit time:", error);
+    return "";
+  }
+}
+
 // 自动生成侧边栏
 function autoSideBar(rootDir: string, dirPath: string) {
   let files = fg.sync(`${rootDir}${dirPath}/**/*.md`, { onlyFiles: true });
   let obj = {};
   files.forEach((file) => {
+    const commitTime = getGitCommitTime(file);
+
     let fileEnd = file.replace(`${rootDir}${dirPath}`, "");
     let fileArrs = fileEnd.split("/");
 
@@ -61,6 +77,7 @@ function autoSideBar(rootDir: string, dirPath: string) {
         text: "" + name.replace(/\d+-/gi, "").replace(".md", ""),
         link: "",
         tags: [],
+        lastUpdated: commitTime,
       };
       if (name.endsWith(".md")) {
         param.link = `${dirPath}${selfPath}`;
