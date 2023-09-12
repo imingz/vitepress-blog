@@ -9,6 +9,7 @@ import {
   ElNotification,
 } from "element-plus";
 import axios from "axios";
+import { copyToClipboard } from "./utils/util";
 
 const { isDark } = useData();
 
@@ -37,23 +38,6 @@ const shortURL = () => {
           type: "error",
         });
       }
-    });
-};
-
-const copyToClipboard = (text: string): Promise<void> => {
-  return navigator.clipboard
-    .writeText(text)
-    .then(() => {
-      ElNotification({
-        message: "链接已复制到剪贴板",
-        type: "success",
-      });
-    })
-    .catch(() => {
-      ElNotification({
-        message: "复制链接到剪贴板失败，请手动复制。",
-        type: "warning",
-      });
     });
 };
 </script>
