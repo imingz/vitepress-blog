@@ -63,6 +63,14 @@ watch(dateValue, (newVal, oldVal) => {
 
 const shortcuts = [
   {
+    text: "🐼 今天",
+    value: () => {
+      const end = new Date();
+      const start = new Date();
+      return [start, end];
+    },
+  },
+  {
     text: "过去一周",
     value: () => {
       const end = new Date();
