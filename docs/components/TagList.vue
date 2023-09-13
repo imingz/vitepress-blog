@@ -53,9 +53,9 @@ watch(tagsValue, (newVal, oldVal) => {
 
     <!-- 相关文章列表 -->
     <el-table :data="relList" stripe style="width: 100%">
-      <el-table-column prop="tags" label="标签" sortable width="180" />
-      <el-table-column prop="text" label="标题" sortable width="180" />
-      <el-table-column prop="link" label="链接" width="180">
+      <el-table-column prop="tags" label="标签" sortable />
+      <el-table-column prop="text" label="标题" sortable />
+      <el-table-column prop="link" label="链接">
         <template #default="{ row }">
           <a :href="row.link" class="tag-link">{{
             row.link
@@ -74,8 +74,10 @@ watch(tagsValue, (newVal, oldVal) => {
 
 <style lang="scss">
 .tag-page {
-  width: 60%;
-  margin: 50px auto;
+  @media (min-width: 414px) {
+    width: 60%;
+    margin: 0 auto;
+  }
   .tag-link {
     color: var(--vp-c-brand-1);
   }

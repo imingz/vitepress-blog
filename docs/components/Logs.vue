@@ -114,13 +114,9 @@ const shortcuts = [
       :shortcuts="shortcuts"
       size="large" />
     <el-table :data="relList" stripe style="width: 100%">
-      <el-table-column
-        prop="lastUpdated"
-        label="更新时间"
-        sortable
-        width="180" />
-      <el-table-column prop="text" label="标题" sortable width="180" />
-      <el-table-column prop="link" label="链接" width="180">
+      <el-table-column prop="lastUpdated" label="更新时间" sortable />
+      <el-table-column prop="text" label="标题" sortable />
+      <el-table-column prop="link" label="链接">
         <template #default="{ row }">
           <a :href="row.link" class="tag-link">{{
             row.link
@@ -139,8 +135,10 @@ const shortcuts = [
 
 <style lang="scss">
 .log-page {
-  width: 60%;
-  margin: 50px auto;
+  @media (min-width: 414px) {
+    width: 60%;
+    margin: 0 auto;
+  }
   .tag-link {
     color: var(--vp-c-brand-1);
   }
