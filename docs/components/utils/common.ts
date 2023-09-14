@@ -29,3 +29,11 @@ export const getUrlParam = (name: string) => {
   const tag = params.get(name);
   return tag;
 };
+
+// 转化时间格式
+export const getReadableTime = (date: Date) => {
+  //
+  return date.getTime()
+    ? `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
+    : "";
+};

@@ -24,7 +24,8 @@ const isShow = computed(() => !!tags.value);
       effect="plain"
       size="small"
       round>
-      <a :href="`/tags?tag=${tag}`">{{ tag }}</a>
+      <!-- <a :href="`/tags?tag=${tag}`">{{ tag }}</a> -->
+      <a :href="`/logs?tag=${tag}`">{{ tag }}</a>
     </el-tag>
   </div>
 </template>

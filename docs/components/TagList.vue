@@ -10,7 +10,7 @@ const tags = list.flatMap((item) => item.tags || []);
 // 初始化选中的标签和可选的标签选项
 const tagsValue: Ref<string[]> = ref([]);
 const uniqueTag = Array.from(new Set(tags));
-const options = uniqueTag.map((tag) => ({ value: tag }));
+const options = uniqueTag.map((tag) => ({ text: tag, value: tag }));
 
 // 初始化相关文章列表
 const relList: Ref<listItem[]> = ref([]);
@@ -34,17 +34,23 @@ watch(tagsValue, (newVal, oldVal) => {
   }
   relList.value = li;
 });
+
+const filterTag = (value: string, row: listItem) => {
+  return row.tags && row.tags.includes(value);
+};
 </script>
 
 <template>
   <div class="tag-page">
+    <slot></slot>
     <!-- 标签选择器 -->
     <el-select
       v-model="tagsValue"
       multiple
       filterable
       style="width: 100%"
-      placeholder="选择想要筛选的标签">
+      placeholder="选择想要筛选的标签"
+      class="tag-filter">
       <el-option
         v-for="item in options"
         :key="item.value"
@@ -53,7 +59,12 @@ watch(tagsValue, (newVal, oldVal) => {
 
     <!-- 相关文章列表 -->
     <el-table :data="relList" stripe style="width: 100%">
-      <el-table-column prop="tags" label="标签" sortable />
+      <el-table-column
+        prop="tags"
+        label="标签"
+        sortable
+        :filters="options"
+        :filter-method="filterTag" />
       <el-table-column prop="text" label="标题" sortable />
       <el-table-column prop="link" label="链接">
         <template #default="{ row }">
@@ -77,6 +88,10 @@ watch(tagsValue, (newVal, oldVal) => {
   @media (min-width: 414px) {
     width: 60%;
     margin: 0 auto;
+  }
+  .tag-filter {
+    padding-top: 16px;
+    padding-bottom: 16px;
   }
   .tag-link {
     color: var(--vp-c-brand-1);

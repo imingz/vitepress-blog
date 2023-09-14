@@ -36,14 +36,14 @@ features:
     details: 希望我的博客能够为你提供有价值的内容和启示。
     link: /9-其他/1-网页/1-vitepress/6-自动导航.md
     linkText: 😸 Go
-  - icon: 🔍
-    title: 标签搜索
-    details: 提供了标签搜索功能。通过点击下方的链接或者页面上面的标签，您可以前往标签搜索页面。
-    link: /tags
-    linkText: 😼 Go
+  # - icon: 🔍
+  #   title: 标签搜索
+  #   details: 提供了标签搜索功能。通过点击下方的链接或者页面上面的标签，您可以前往标签搜索页面。
+  #   link: /tags
+  #   linkText: 😼 Go
   - icon: 🗒️
-    title: 日志
-    details: 按照年月日的时间线记录每次的更新。您可以了解到博客的最新动态，了解每次更新的具体内容、时间。
+    title: 日志与搜索
+    details: 按照年月日的时间线记录每次的更新。整合标签搜索功能。
     link: /logs
     linkText: 😽
 ---

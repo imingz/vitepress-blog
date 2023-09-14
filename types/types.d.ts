@@ -35,5 +35,5 @@ declare type listItem = {
   link: string; // 链接
   text: string; // 标题
   tags?: string[]; // 标签
-  lastUpdated?: Date;
+  lastUpdated: Date;
 };
