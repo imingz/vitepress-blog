@@ -306,6 +306,14 @@ streamSource.broadcast();
 streamSource.global();
 ```
 
+### keyBy
+
+按指定 key 发送，相同 key 发往同一个子任务。
+
+### forward
+
+one-to-one
+
 ### Custom 自定义分区
 
 当 Flink 提供的所有分区策略都不能满足用户的需求时，我们可以通过使用 `partitionCustom()` 方法来自定义分区策略。
@@ -332,6 +340,77 @@ public static void main(String[] args) throws Exception {
     DataStreamSource<Long> streamSource = env.fromSequence(1, 100);
 
     streamSource.partitionCustom(new MyPartitioner(), value -> value).print();
+
+    env.execute();
+}
+```
+
+## 分流
+
+所谓“分流”，就是将一条数据流拆分成完全独立的两条、甚至多条流。也就是基于一个 DataStream，定义一些筛选条件，将符合条件的数据拣选出来放到对应的流里。
+
+### 简单实现
+
+其实根据条件筛选数据的需求，本身非常容易实现：只要针对同一条流多次独立调用 `filter()` 方法进行筛选，就可以得到拆分之后的流了。
+
+```java
+public static void main(String[] args) throws Exception {
+    StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+
+    SingleOutputStreamOperator<Integer> stream = env.fromSequence(1, 10).map(String::valueOf).map(Integer::valueOf);
+
+    stream.filter(x -> x % 2 == 0).print("偶数");
+    stream.filter(x -> x % 2 == 1).print("奇数");
+
+    env.execute();
+}
+```
+
+这段代码的实现虽然简单，但是代码有些冗余。处理逻辑对拆分出的三条流其实是一样的，但是重复写了三次。此外，这段代码的含义是将原始数据流复制三份，然后对每一份分别做筛选，这明显不够高效。因此，我们可以考虑使用一个算子来拆分流，而不是复制流。
+
+### 使用侧输出流
+
+绝大多数转换算子，输出的都是单一流，流里的数据类型只能有一种。而侧输出流可以认为是“主流”上分叉出的“支流”，所以可以由一条流产生出多条流，而且这些流中的数据类型还可以不一样。利用这个功能可以很容易地实现“分流”操作。
+
+具体应用时，只要在处理函数的 `processElement()` 或者 `onTimer()` 方法中，调用上下文的 `output()` 方法就可以了。
+
+简单来说，只需要调用上下文 ctx 的 `output()` 方法，就可以输出任意类型的数据了。而侧输出流的标记和提取，都离不开一个“输出标签”（`OutputTag`），指定了侧输出流的 id 和类型。
+
+```java
+public static void main(String[] args) throws Exception {
+    StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+
+    DataStreamSource<WaterSensor> streamSource = env.fromElements(
+            new WaterSensor("sensor 1", 1L, 1),
+            new WaterSensor("sensor 1", 5L, 5),
+            new WaterSensor("sensor 1", 33L, 33),
+            new WaterSensor("sensor 2", 2L, 2),
+            new WaterSensor("sensor 2", 3L, 3),
+            new WaterSensor("sensor 4", 4L, 4)
+    );
+
+    OutputTag<WaterSensor> s1 = new OutputTag<WaterSensor>("sensor 1", Types.POJO(WaterSensor.class)) {
+    };
+    OutputTag<WaterSensor> s2 = new OutputTag<WaterSensor>("sensor 2", Types.POJO(WaterSensor.class)) {
+    };
+
+    // 返回的都是主流
+    SingleOutputStreamOperator<WaterSensor> process = streamSource.process(new ProcessFunction<WaterSensor, WaterSensor>() {
+        @Override
+        public void processElement(WaterSensor value, ProcessFunction<WaterSensor, WaterSensor>.Context ctx, Collector<WaterSensor> out) throws Exception {
+            if ("sensor 1".equals(value.getId())) {
+                ctx.output(s1, value);
+            } else if ("sensor 2".equals(value.getId())) {
+                ctx.output(s2, value);
+            } else {
+                // 主流
+                out.collect(value);
+            }
+        }
+    });
+
+    process.getSideOutput(s1).printToErr("s1");
+    process.getSideOutput(s2).printToErr("s2");
 
     env.execute();
 }
