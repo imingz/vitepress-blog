@@ -31,6 +31,7 @@
     "nolint",
     "oltp",
     "ratelimit",
+    "rebalance",
     "remotecache",
     "Replicaset",
     "simpledriver",

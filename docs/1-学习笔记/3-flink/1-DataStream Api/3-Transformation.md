@@ -251,3 +251,88 @@ Rich Function 有生命周期的概念。典型的生命周期方法有：
 - `close()`: 是生命周期中的最后一个调用的方法，类似于结束方法。一般用来做一些清理工作。
 
 需要注意的是，这里的生命周期方法，对于一个并行子任务来说只会调用一次；而对应的，实际工作方法，例如 `RichMapFunction` 中的 `map()`，在每条数据到来后都会触发一次调用。
+
+## Physical Partitioning 物理分区算子
+
+常见的物理分区策略有：随机分配（Random）、轮询分配（Round-Robin）、重缩放（Rescale）和广播（Broadcast）。
+
+### shuffle 随机分区
+
+最简单的重分区方式就是直接“洗牌”。通过调用 `DataStream` 的 `shuffle()` 方法，将数据随机地分配到下游算子的并行任务中去。
+
+```java
+streamSource.shuffle();
+```
+
+随机分区服从均匀分布（uniform distribution），所以可以把流中的数据随机打乱，均匀地传递到下游任务分区。因为是完全随机的，所以对于同样的输入数据, 每次执行得到的结果也不会相同。
+
+![Alt text](images/3-Transformation/image.png)
+
+经过随机分区之后，得到的依然是一个 DataStream。
+
+### rebalance 轮询分区
+
+轮询，简单来说就是“发牌”，按照先后顺序将数据做依次分发。通过调用 `DataStream` 的 `rebalance()` 方法，就可以实现轮询重分区。`rebalance` 使用的是 `Round-Robin` 负载均衡算法，可以将输入流数据平均分配到下游的并行任务中去。
+
+```java
+streamSource.rebalance();
+```
+
+![Alt text](images/3-Transformation/image-1.png)
+
+### rescale 重缩放分区
+
+重缩放分区和轮询分区非常相似。当调用 `rescale()` 方法时，其实底层也是使用 `Round-Robin` 算法进行轮询，但是只会将数据轮询发送到下游并行任务的一部分中。`rescale()` 的做法是分成小团体，发牌人只给自己团体内的所有人轮流发牌。
+
+```java
+streamSource.rescale();
+```
+
+![Alt text](images/3-Transformation/image-2.png)
+
+### broadcast 广播
+
+这种方式其实不应该叫做“重分区”，因为经过广播之后，数据会在不同的分区都保留一份，可能进行重复处理。可以通过调用 `broadcast()` 方法，将输入数据复制并发送到下游算子的所有并行任务中去。
+
+```java
+streamSource.broadcast();
+```
+
+### global 全局分区
+
+全局分区也是一种特殊的分区方式。这种做法非常极端，通过调用 `global()` 方法，会将所有的输入流数据都发送到下游算子的第一个并行子任务中去。这就相当于强行让下游任务并行度变成了 1，所以使用这个操作需要非常谨慎，可能对程序造成很大的压力。
+
+```java
+streamSource.global();
+```
+
+### Custom 自定义分区
+
+当 Flink 提供的所有分区策略都不能满足用户的需求时，我们可以通过使用 `partitionCustom()` 方法来自定义分区策略。
+
+自定义分区器：
+
+```java
+public class MyPartitioner implements Partitioner<Long> {
+    @Override
+    public int partition(Long key, int numPartitions) {
+        return (int) (key % numPartitions);
+    }
+}
+```
+
+使用自定义分区
+
+```java
+public static void main(String[] args) throws Exception {
+    StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+
+    env.setParallelism(2);
+
+    DataStreamSource<Long> streamSource = env.fromSequence(1, 100);
+
+    streamSource.partitionCustom(new MyPartitioner(), value -> value).print();
+
+    env.execute();
+}
+```
