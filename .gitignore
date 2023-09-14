@@ -5,3 +5,4 @@ docs/.vitepress/cache
 _obsidian/
 yarn-error.log
 docs/test
+.vercel
