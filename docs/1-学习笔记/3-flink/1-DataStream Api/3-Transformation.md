@@ -415,3 +415,178 @@ public static void main(String[] args) throws Exception {
     env.execute();
 }
 ```
+
+## 合流-基本操作
+
+在实际应用中，我们经常会遇到来源不同的多条流，需要将它们的数据进行联合处理。
+
+所以 Flink 中合流的操作会更加普遍，对应的 API 也更加丰富。
+
+### Union 联合
+
+最简单的合流操作，就是直接将多条流合在一起，叫作流的“联合”（union）。
+
+联合操作要求必须流中的数据类型必须相同，合并之后的新流会包括所有流中的元素，数据类型不变。
+
+```java
+stream1.union(stream2, stream3, ...)
+```
+
+示例：
+
+```java
+public static void main(String[] args) throws Exception {
+    StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+    env.setParallelism(1);
+
+    DataStreamSource<Integer> ds1 = env.fromElements(1, 2, 3);
+    DataStreamSource<Integer> ds2 = env.fromElements(4, 5, 6);
+    DataStreamSource<String> ds3 = env.fromElements("7", "8", "9");
+
+    ds1.union(ds2, ds3.map(Integer::valueOf))
+            .print();
+
+    env.execute();
+}
+```
+
+### Connect 连接
+
+流的联合虽然简单，不过受限于数据类型不能改变，灵活性大打折扣，所以实际应用较少出现。除了联合（`union`），Flink 还提供了另外一种方便的合流操作——连接 `connect`。
+
+#### ConnectedStreams 连接流
+
+为了处理更加灵活，连接操作允许流的数据类型不同。
+
+但我们知道一个 DataStream 中的数据只能有唯一的类型，所以连接得到的并不是 DataStream，而是一个“连接流”。
+
+连接流可以看成是两条流形式上的“统一”，被放在了一个同一个流中；事实上内部仍保持各自的数据形式不变，彼此之间是相互独立的。要想得到新的 DataStream，还需要进一步定义一个“同处理”（co-process）转换操作，用来说明对于不同来源、不同类型的数据，怎样分别进行处理转换、得到统一的输出类型。
+
+所以整体上来，两条流的连接就像是“一国两制”，两条流可以保持各自的数据类型、处理方式也可以不同，不过最终还是会统一到同一个 DataStream 中。
+
+![Alt text](images/3-Transformation/image-3.png)
+
+代码实现：需要分为两步：首先基于一条 DataStream 调用 `connect()` 方法，传入另外一条 DataStream 作为参数，将两条流连接起来，得到一个 ConnectedStreams；然后再调用同处理方法得到 DataStream。这里可以的调用的同处理方法有 `map()` / `flatMap()`，以及 `process()` 方法。
+
+1. 一次只能连接 2 条流
+2. 流的数据类型可以不一样
+3. 连接后可以调用 `map`、`flatmap`、`process` 来处理，但是各处理各的
+
+```java
+public class DataStreamApiDemo {
+    public static void main(String[] args) throws Exception {
+        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+        env.setParallelism(1);
+
+        DataStreamSource<Integer> ds1 = env.fromElements(1, 2, 3);
+        DataStreamSource<String> ds2 = env.fromElements("4", "5", "6");
+
+        ConnectedStreams<Integer, String> connect = ds1.connect(ds2);
+        SingleOutputStreamOperator<String> res = connect.map(new CoMapFunction<Integer, String, String>() {
+
+            @Override
+            public String map1(Integer value) throws Exception {
+                return "from number stream: " + value.toString();
+            }
+
+            @Override
+            public String map2(String value) throws Exception {
+                return "from string stream: " + value;
+            }
+
+        });
+        ;
+
+        res.print();
+
+        env.execute();
+    }
+}
+```
+
+调用 `map()` 方法时传入的不再是一个简单的 `MapFunction`，而是一个 `CoMapFunction`，表示分别对两条流中的数据执行 map 操作。这个接口有三个类型参数，依次表示第一条流、第二条流，以及合并后的流中的数据类型。需要实现的方法也非常直白：`map1()` 就是对第一条流中数据的 map 操作，`map2()` 则是针对第二条流。
+
+类似的还有 `CoProcessFunction` ，调用 `process()` 时，传入的则是一个 `CoProcessFunction`。它也是 “处理函数” 家族中的一员，用法非常相似。它需要实现的就是 `processElement1()`、`processElement2()` 两个方法，在每个数据到来时，会根据来源的流调用其中的一个方法进行处理。
+
+值得一提的是，ConnectedStreams 也可以直接调用 `keyBy()` 进行按键分区的操作，得到的还是一个 ConnectedStreams 。
+
+```java
+connectedStreams.keyBy(keySelector1, keySelector2);
+```
+
+这里传入两个参数 `keySelector1` 和 `keySelector2` ，是两条流中各自的键选择器；当然也可以直接传入键的位置值（keyPosition），或者键的字段名（field），这与普通的 `keyBy` 用法完全一致。ConnectedStreams 进行 `keyBy` 操作，其实就是把两条流中 key 相同的数据放到了一起，然后针对来源的流再做各自处理，这在一些场景下非常有用。
+
+```java
+public class DataStreamApiDemo {
+    public static void main(String[] args) throws Exception {
+        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+        env.setParallelism(1);
+
+        DataStreamSource<Tuple2<Integer, String>> ds1 = env.fromElements(
+                Tuple2.of(1, "a1"),
+                Tuple2.of(1, "a2"),
+                Tuple2.of(2, "b1"),
+                Tuple2.of(3, "c1"));
+        DataStreamSource<Tuple3<Integer, String, Integer>> ds2 = env.fromElements(
+                Tuple3.of(1, "aa1", 9),
+                Tuple3.of(1, "aa2", 8),
+                Tuple3.of(2, "bb1", 7),
+                Tuple3.of(3, "cc1", 6));
+
+        ConnectedStreams<Tuple2<Integer, String>, Tuple3<Integer, String, Integer>> connect = ds1.connect(ds2);
+
+        ConnectedStreams<Tuple2<Integer, String>, Tuple3<Integer, String, Integer>> keyBy = connect.keyBy(s1 -> s1.f0,
+                s2 -> s2.f0);
+
+        SingleOutputStreamOperator<String> res = keyBy
+                .process(new CoProcessFunction<Tuple2<Integer, String>, Tuple3<Integer, String, Integer>, String>() {
+                    Map<Integer, List<Tuple2<Integer, String>>> s1Cache = new HashMap<>();
+                    Map<Integer, List<Tuple3<Integer, String, Integer>>> s2Cache = new HashMap<>();
+
+                    @Override
+                    public void processElement1(Tuple2<Integer, String> value,
+                            CoProcessFunction<Tuple2<Integer, String>, Tuple3<Integer, String, Integer>, String>.Context ctx,
+                            Collector<String> out) throws Exception {
+                        Integer id = value.f0;
+                        if (!s1Cache.containsKey(id)) {
+                            List<Tuple2<Integer, String>> s1Values = new ArrayList<>();
+                            s1Values.add(value);
+                            s1Cache.put(id, s1Values);
+                        } else {
+                            s1Cache.get(id).add(value);
+                        }
+
+                        if (s2Cache.containsKey(id)) {
+                            for (Tuple3<Integer, String, Integer> s2Element : s2Cache.get(id)) {
+                                out.collect("s1: " + value + "<---> s2: " + s2Element);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void processElement2(Tuple3<Integer, String, Integer> value,
+                            CoProcessFunction<Tuple2<Integer, String>, Tuple3<Integer, String, Integer>, String>.Context ctx,
+                            Collector<String> out) throws Exception {
+                        Integer id = value.f0;
+
+                        if (!s2Cache.containsKey(id)) {
+                            List<Tuple3<Integer, String, Integer>> s2Values = new ArrayList<>();
+                            s2Values.add(value);
+                            s2Cache.put(id, s2Values);
+                        } else {
+                            s2Cache.get(id).add(value);
+                        }
+
+                        if (s1Cache.containsKey(id)) {
+                            for (Tuple2<Integer, String> s1Element : s1Cache.get(id)) {
+                                out.collect("s2: " + value + "<---> s1: " + s1Element);
+                            }
+                        }
+                    }
+                });
+
+        res.print();
+        env.execute();
+    }
+}
+```
