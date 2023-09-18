@@ -12,7 +12,7 @@ Flink 是一种流式计算引擎，主要是来处理无界数据流的，数�
 
 在 Flink 中，窗口其实并不是一个“框”，应该把窗口理解成一个“桶”。在 Flink 中，窗口可以把流切割成有限大小的多个“存储桶”（bucket）；每个数据都会分发到对应的桶中，当到达窗口结束时间时，就对每个桶中收集的数据进行计算处理。
 
-![Alt text](images/1-%E7%AA%97%E5%8F%A3/image.png)
+![Alt text](images/image-0.png)
 
 Flink 中窗口并不是静态准备好的，而是动态创建。当有落在这个窗口区间范围的数据达到时，才创建对应的窗口。另外，这里我们认为到达窗口结束时间时，窗口就触发计算并关闭，事实上“触发计算”和“窗口关闭”两个行为也可以分开。
 
@@ -47,7 +47,7 @@ Flink 中内置的窗口的的分类：
 
 滚动窗口应用非常广泛，它可以对每个时间段做聚合统计，很多 BI 分析指标都可以用它来实现。
 
-![Alt text](<images/1-窗口 Window/image.png>)
+![Alt text](images/image.png)
 
 #### 滑动窗口 Sliding Windows
 
@@ -61,7 +61,7 @@ Flink 中内置的窗口的的分类：
 
 滑动窗口适合计算结果更新频率非常高的场景。
 
-![Alt text](<images/1-窗口 Window/image-1.png>)
+![Alt text](images/image-1.png)
 
 #### 会话窗口 Session Windows
 
@@ -73,7 +73,7 @@ Flink 中内置的窗口的的分类：
 
 在一些类似保持会话的场景下，可以使用会话窗口来进行数据的处理统计。
 
-![Alt text](<images/1-窗口 Window/image-2.png>)
+![Alt text](images/image-2.png)
 
 #### 全局窗口 Global Windows
 
@@ -81,7 +81,7 @@ Flink 中内置的窗口的的分类：
 
 全局窗口没有结束的时间点，所以一般在希望做更加灵活的窗口处理时自定义使用。Flink 中的计数窗口（Count Window），底层就是用全局窗口实现的。
 
-![Alt text](<images/1-窗口 Window/image-3.png>)
+![Alt text](images/image-3.png)
 
 ## API 概览
 
