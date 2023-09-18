@@ -152,13 +152,13 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       ...navBar,
-      // {
-      //   text: "标签搜索",
-      //   link: "/tags",
-      // },
       {
         text: "日志与搜索",
         link: "/logs",
+      },
+      {
+        text: "文件中转站",
+        link: "/filetransfer",
       },
     ],
 
