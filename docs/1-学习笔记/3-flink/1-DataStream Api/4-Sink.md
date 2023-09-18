@@ -25,7 +25,7 @@ stream.sinkTo(...)
 
 除此以外，就需要用户自定义实现 sink 连接器了。
 
-## 输出到文件
+### 输出到文件
 
 Flink 专门提供了一个流式文件系统的连接器：`FileSink`，为批处理和流处理提供了一个统一的 Sink，它可以将分区文件写入 Flink 支持的文件系统。
 
@@ -100,3 +100,9 @@ public class FileSinkDemo {
 ```
 
 :::
+
+### 输出到 Kafka
+
+// todo p82
+
+本地 kafka 失效了，后面有空补。
