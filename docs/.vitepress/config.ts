@@ -1,5 +1,5 @@
 import { defineConfig } from "vitepress";
-import katex from "markdown-it-katex";
+import mathjax from "markdown-it-mathjax3";
 import footnote_plugin from "markdown-it-footnote";
 import todo from "markdown-it-task-lists";
 import customAttrs from "markdown-it-custom-attrs";
@@ -137,7 +137,7 @@ export default defineConfig({
     lineNumbers: true,
     config: (md) => {
       // LaTex 解析
-      md.use(katex);
+      md.use(mathjax);
       // 脚注
       md.use(footnote_plugin);
       // 插件todo
@@ -212,7 +212,7 @@ export default defineConfig({
   vue: {
     template: {
       compilerOptions: {
-        isCustomElement: (tag) => customElements.includes(tag),
+        // isCustomElement: (tag) => customElements.includes(tag),
       },
     },
   },
@@ -220,92 +220,3 @@ export default defineConfig({
     // envDir: "",
   },
 });
-
-const customElements = [
-  // katex 标签
-  "math",
-  "maction",
-  "maligngroup",
-  "malignmark",
-  "menclose",
-  "merror",
-  "mfenced",
-  "mfrac",
-  "mi",
-  "mlongdiv",
-  "mmultiscripts",
-  "mn",
-  "mo",
-  "mover",
-  "mpadded",
-  "mphantom",
-  "mroot",
-  "mrow",
-  "ms",
-  "mscarries",
-  "mscarry",
-  "mscarries",
-  "msgroup",
-  "mstack",
-  "mlongdiv",
-  "msline",
-  "mstack",
-  "mspace",
-  "msqrt",
-  "msrow",
-  "mstack",
-  "mstack",
-  "mstyle",
-  "msub",
-  "msup",
-  "msubsup",
-  "mtable",
-  "mtd",
-  "mtext",
-  "mtr",
-  "munder",
-  "munderover",
-  "semantics",
-  "math",
-  "mi",
-  "mn",
-  "mo",
-  "ms",
-  "mspace",
-  "mtext",
-  "menclose",
-  "merror",
-  "mfenced",
-  "mfrac",
-  "mpadded",
-  "mphantom",
-  "mroot",
-  "mrow",
-  "msqrt",
-  "mstyle",
-  "mmultiscripts",
-  "mover",
-  "mprescripts",
-  "msub",
-  "msubsup",
-  "msup",
-  "munder",
-  "munderover",
-  "none",
-  "maligngroup",
-  "malignmark",
-  "mtable",
-  "mtd",
-  "mtr",
-  "mlongdiv",
-  "mscarries",
-  "mscarry",
-  "msgroup",
-  "msline",
-  "msrow",
-  "mstack",
-  "maction",
-  "semantics",
-  "annotation",
-  "annotation-xml",
-];

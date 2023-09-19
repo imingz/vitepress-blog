@@ -5,10 +5,38 @@ tags: [VitePress]
 # VitePress 解析展示 LaTeX 数学公式
 
 ::: tip 注意
-更新时间：2023/08/30
+更新时间：2023/09/16
 
-VitePress 版本: v1.0.0-rc.10
+VitePress 版本: v1.0.0-rc.14
 :::
+
+由于 VitePress 版本: v1.0.0-rc.14 更新支持了 mathjax，改为使用 mathjax
+
+```sh
+bun add -D markdown-it-mathjax3
+```
+
+```ts
+// config.ts
+import katex from "markdown-it-katex"; // [!code --]
+import mathjax from "markdown-it-mathjax3"; // [!code ++]
+
+...
+      md.use(katex); // [!code --]
+      md.use(mathjax); // [!code ++]
+...
+
+        isCustomElement: (tag) => customElements.includes(tag),// [!code --]
+
+...
+
+const customElements = [ // [!code --]
+  ...// [!code --]
+];// [!code --]
+
+```
+
+## 原来的
 
 VitePress 默认的 markdown 解析器 markdown-it 不支持 LaTeX 数学公式的解析展示，需要安装扩展插件，此处使用 markdown-it-katex
 
