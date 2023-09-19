@@ -156,10 +156,10 @@ export default defineConfig({
         text: "日志与搜索",
         link: "/logs",
       },
-      {
-        text: "文件中转站",
-        link: "/filetransfer",
-      },
+      // {
+      //   text: "文件中转站",
+      //   link: "/filetransfer",
+      // },
     ],
 
     sidebar: sideBar,

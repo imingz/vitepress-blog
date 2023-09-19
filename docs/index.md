@@ -20,7 +20,7 @@ hero:
   actions:
     - theme: brand
       text: Let's Go 🐈‍⬛
-      link: /tags
+      link: /logs
     - theme: alt
       text: Github
       link: www.github.com/imingz
