@@ -18,23 +18,83 @@ bun add -D markdown-it-mathjax3
 
 ```ts
 // config.ts
-import katex from "markdown-it-katex"; // [!code --]
 import mathjax from "markdown-it-mathjax3"; // [!code ++]
 
+export default defineConfig({
+  ...
+  markdown: {
+    config: (md) => {
+      md.use(mathjax); // LaTex 解析 // [!code ++]
+    },
+  },
+  ...
+})
+```
+
+::: details 迁移额外工作
+
+```ts
+import katex from "markdown-it-katex"; // [!code --]
 ...
       md.use(katex); // [!code --]
-      md.use(mathjax); // [!code ++]
 ...
-
         isCustomElement: (tag) => customElements.includes(tag),// [!code --]
-
 ...
-
 const customElements = [ // [!code --]
   ...// [!code --]
 ];// [!code --]
 
 ```
+
+:::
+
+## 例子
+
+### 行内 `$`
+
+#### 输入
+
+```
+行内公式: $\sqrt{3x-1}+(1+x)^2$
+```
+
+#### 输出
+
+行内公式: $\sqrt{3x-1}+(1+x)^2$
+
+### 块 `$$`
+
+#### 输入
+
+```
+$$
+\begin{array}{c}
+
+\nabla \times \vec{\mathbf{B}} -\, \frac1c\, \frac{\partial\vec{\mathbf{E}}}{\partial t} &
+= \frac{4\pi}{c}\vec{\mathbf{j}}    \nabla \cdot \vec{\mathbf{E}} & = 4 \pi \rho \\
+
+\nabla \times \vec{\mathbf{E}}\, +\, \frac1c\, \frac{\partial\vec{\mathbf{B}}}{\partial t} & = \vec{\mathbf{0}} \\
+
+\nabla \cdot \vec{\mathbf{B}} & = 0
+
+\end{array}
+$$
+```
+
+#### 输出
+
+$$
+\begin{array}{c}
+
+\nabla \times \vec{\mathbf{B}} -\, \frac1c\, \frac{\partial\vec{\mathbf{E}}}{\partial t} &
+= \frac{4\pi}{c}\vec{\mathbf{j}}    \nabla \cdot \vec{\mathbf{E}} & = 4 \pi \rho \\
+
+\nabla \times \vec{\mathbf{E}}\, +\, \frac1c\, \frac{\partial\vec{\mathbf{B}}}{\partial t} & = \vec{\mathbf{0}} \\
+
+\nabla \cdot \vec{\mathbf{B}} & = 0
+
+\end{array}
+$$
 
 ## 原来的
 
