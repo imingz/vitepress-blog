@@ -8,7 +8,7 @@
 import { computed, ref } from "vue";
 import { useRoute } from "vitepress";
 import { ElNotification } from "element-plus";
-import axios from "axios";
+import service from "../../../components/utils/request.js";
 import Share from "./svg/Share.vue";
 
 const protocol = "https://"; // window.location.protocol + "//";
@@ -23,8 +23,8 @@ const url = computed(() => {
 const sUrl = ref("");
 
 const openShare = async () => {
-  await axios
-    .get("https://a.imingz.fun/shortLink?url=" + url.value, { timeout: 5000 })
+  await service
+    .get("/shortLink?url=" + url.value, { timeout: 5000 })
     .then((response) => {
       sUrl.value = response.data;
       copyToClipboard(sUrl.value);
