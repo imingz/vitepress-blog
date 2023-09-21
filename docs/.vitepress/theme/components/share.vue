@@ -24,7 +24,7 @@ const sUrl = ref("");
 
 const openShare = async () => {
   await service
-    .get("/shortLink?url=" + url.value, { timeout: 5000 })
+    .get("/shorturl?url=" + url.value, { timeout: 5000 })
     .then((response) => {
       sUrl.value = response.data;
       copyToClipboard(sUrl.value);
