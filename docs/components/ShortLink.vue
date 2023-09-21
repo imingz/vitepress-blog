@@ -8,7 +8,7 @@ import {
   ElButton,
   ElNotification,
 } from "element-plus";
-import axios from "axios";
+import service from "./utils/request";
 import { copyToClipboard } from "./utils/util";
 
 const { isDark } = useData();
@@ -19,8 +19,8 @@ const form = reactive({
 });
 
 const shortURL = () => {
-  axios
-    .get("https://a.imingz.fun/shortLink?url=" + form.oUrl, { timeout: 5000 })
+  service
+    .get("/shorturl?url=" + form.oUrl)
     .then((response) => {
       form.sUrl = response.data;
       copyToClipboard(response.data);

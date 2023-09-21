@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, Ref } from "vue";
-import service from "../.vitepress/util/request";
+import service from "./utils/request";
 import { ElNotification } from "element-plus";
 
 interface Payday {
