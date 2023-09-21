@@ -1,6 +1,7 @@
 import { h, watch } from "vue";
 import { useData, EnhanceAppContext } from "vitepress";
 import DefaultTheme from "vitepress/theme";
+import Documate from "@documate/vue";
 
 import NavBarTitleBefore from "./components/NavBarTitleBefore.vue";
 import Tags from "./components/Tags.vue";
@@ -10,6 +11,7 @@ import ElementPlus from "element-plus";
 import zhCn from "element-plus/dist/locale/zh-cn.mjs";
 import "dayjs/locale/zh-cn";
 
+import '@documate/vue/dist/style.css'
 import "./styles/index.scss";
 
 if (typeof window !== "undefined") {
@@ -57,6 +59,10 @@ export default {
       "nav-bar-title-before": () => h(NavBarTitleBefore),
       "doc-before": () => h(Tags),
       "nav-bar-content-after": () => h(Share),
+      "nav-bar-content-before": () =>
+        h(Documate, {
+          endpoint: "https://tg8r1357dz.us.aircode.run/ask",
+        }),
     });
   },
   enhanceApp({ app, router }: EnhanceAppContext) {

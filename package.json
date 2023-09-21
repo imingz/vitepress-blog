@@ -7,6 +7,7 @@
   "author": "imimgz <imingz@qq.com>",
   "license": "MIT",
   "devDependencies": {
+    "@documate/documate": "latest",
     "@mdit-vue/shared": "^0.12.0",
     "@types/markdown-it-footnote": "^3.0.0",
     "@types/node": "^20.4.9",
@@ -20,11 +21,15 @@
     "markdown-it-mathjax3": "^4.3.2",
     "markdown-it-task-lists": "^2.1.1",
     "sass": "^1.65.1",
-    "vitepress": "^1.0.0-rc.14"
+    "vitepress": "^1.0.0-rc.15"
   },
   "scripts": {
     "dev": "vitepress dev docs",
     "build": "vitepress build docs",
-    "preview": "vitepress preview docs"
+    "preview": "vitepress preview docs",
+    "documate:upload": "documate upload"
+  },
+  "dependencies": {
+    "@documate/vue": "latest"
   }
 }
