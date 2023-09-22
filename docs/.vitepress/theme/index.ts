@@ -11,7 +11,6 @@ import ElementPlus from "element-plus";
 import zhCn from "element-plus/dist/locale/zh-cn.mjs";
 import "dayjs/locale/zh-cn";
 
-import '@documate/vue/dist/style.css'
 import "./styles/index.scss";
 
 if (typeof window !== "undefined") {

@@ -97,23 +97,14 @@ export default defineConfig({
   head: [
     // fav图标
     ["link", { rel: "icon", href: "/favicon.ico" }],
-    // katex 样式
-    [
-      "link",
-      {
-        rel: "stylesheet",
-        href: "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.css",
-        crossorigin: "anonymous",
-      },
-    ],
     // 图片放大预览
-    [
-      "link",
-      {
-        rel: "stylesheet",
-        href: "https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css",
-      },
-    ],
+    // [
+    //   "link",
+    //   {
+    //     rel: "stylesheet",
+    //     href: "https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css",
+    //   },
+    // ],
     [
       "script",
       {
