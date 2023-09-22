@@ -18,7 +18,8 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/too
 
 ## 修改配置文件
 
-```zshrc
+```sh
+// .zshrc
 # Path to your oh-my-zsh installation.
 export ZSH=$HOME/.oh-my-zsh
 
@@ -52,11 +53,11 @@ export LANG=zh_CN.UTF-8
 
 ::: code-group
 
-```zsh-autosuggestions
+```sh [zsh-autosuggestions]
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 ```
 
-```zsh-syntax-highlighting
+```sh [zsh-syntax-highlighting]
 git clone https://github.com/zsh-users/zsh-syntax-highlighting ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 ```
 

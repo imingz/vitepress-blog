@@ -20,6 +20,7 @@ sudo apt-get install  -y language-pack-zh-hans
 
 ## 修改 shell 配置文件
 
-```zshrc
+```sh
+// .zshrc
 export LANG=zh_CN.UTF-8
 ```
