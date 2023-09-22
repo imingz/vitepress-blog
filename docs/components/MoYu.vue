@@ -67,8 +67,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="parent">
-    <div class="div1">
+  <div class="moyu-page">
+    <div class="moyu-hello">
       <el-card>
         <p>{{ todayText }}</p>
         <p>早安，摸鱼人！</p>
@@ -78,7 +78,7 @@ onMounted(() => {
         </p>
       </el-card>
     </div>
-    <div class="div2">
+    <div class="moyu-holiday">
       <el-card>
         <template #header>
           <div>
@@ -100,7 +100,7 @@ onMounted(() => {
         </p>
       </el-card>
     </div>
-    <div class="div3">
+    <div class="moyu-salary">
       <el-card>
         <template #header>
           <div>
@@ -116,21 +116,29 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.parent {
+.moyu-page {
   display: grid;
-  grid-template-columns: 0fr 1fr repeat(3, 0.5fr) 1fr 0fr;
-  grid-template-rows: 0fr 1fr 0.1fr repeat(2, 1fr);
-  grid-column-gap: 10px;
-  grid-row-gap: 10px;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  grid-column-gap: 14px;
+  grid-row-gap: 14px;
 }
 
-.div1 {
-  grid-area: 2 / 2 / 3 / 7;
+.moyu-hello {
+  grid-area: 1 / 1 / 2 / 3;
 }
-.div2 {
-  grid-area: 4 / 2 / 6 / 4;
+.moyu-holiday {
+  grid-area: 2 / 1 / 4 / 2;
+
+  @media (max-width: 414px) {
+    grid-area: 2 / 1 / 3 / 3;
+  }
 }
-.div3 {
-  grid-area: 4 / 5 / 6 / 7;
+.moyu-salary {
+  grid-area: 2 / 2 / 4 / 3;
+
+  @media (max-width: 414px) {
+    grid-area: 3 / 1 / 3 / 3;
+  }
 }
 </style>
