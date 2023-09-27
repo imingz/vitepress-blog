@@ -15,6 +15,9 @@
     "datapage",
     "daterange",
     "Debugf",
+    "demoapi",
+    "demonote",
+    "demouser",
     "Dexecution",
     "dtos",
     "ECONNABORTED",
@@ -45,6 +48,7 @@
     "sortedset",
     "Sprintf",
     "staticcheck",
+    "userservice",
     "vitepress",
     "xxapi",
     "yidocs"
