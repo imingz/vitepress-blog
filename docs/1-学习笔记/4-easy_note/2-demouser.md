@@ -294,8 +294,12 @@ docker-compose up -d
 
 业务流程梳理
 
-1. validate
-2. create
+1. `validate`
+2. `create`
+
+`validate` 由于借助了插件，可以直接完成。
+
+主要考虑 `create`，很显然可以借助 `service` 层的 `CreateUser(req)`
 
 ::: code-group
 
@@ -303,7 +307,21 @@ docker-compose up -d
 // CreateUser implements the UserServiceImpl interface.
 func (s *UserServiceImpl) CreateUser(ctx context.Context, req *demouser.CreateUserRequest) (resp *demouser.CreateUserResponse, err error) {
     // TODO: Your code here... // [!code --]
-    resp = new(demouser.CreateUserResponse) // [!code ++:8]
+    resp = new(demouser.CreateUserResponse) // [!code ++:7]
+
+    // 1. validate
+    if err = req.IsValid(); err != nil {
+        resp.BaseResp = pack.BuildBaseResp(errno.ParamErr)
+        return resp, nil
+    }
+    return
+}
+```
+
+```go [create]
+// CreateUser implements the UserServiceImpl interface.
+func (s *UserServiceImpl) CreateUser(ctx context.Context, req *demouser.CreateUserRequest) (resp *demouser.CreateUserResponse, err error) {
+    resp = new(demouser.CreateUserResponse)
 
     // 1. validate
     if err = req.IsValid(); err != nil {
@@ -311,15 +329,23 @@ func (s *UserServiceImpl) CreateUser(ctx context.Context, req *demouser.CreateUs
         return resp, nil
     }
 
-    return
+    // 2. create  // [!code ++:9]
+    err = service.NewCreateUserService(ctx).CreateUser(req)
+    if err != nil {
+        resp.BaseResp = pack.BuildBaseResp(err)
+        return resp, nil
+    }
+
+    resp.BaseResp = pack.BuildBaseResp(errno.Success)
+    return resp, nil
+    return  // [!code --]
 }
 ```
 
 ```go [user/handler.go]
 // CreateUser implements the UserServiceImpl interface.
 func (s *UserServiceImpl) CreateUser(ctx context.Context, req *demouser.CreateUserRequest) (resp *demouser.CreateUserResponse, err error) {
-    // TODO: Your code here... // [!code --]
-    resp = new(demouser.CreateUserResponse) // [!code ++:17]
+    resp = new(demouser.CreateUserResponse)
 
     // 1. validate
     if err = req.IsValid(); err != nil {
@@ -336,7 +362,98 @@ func (s *UserServiceImpl) CreateUser(ctx context.Context, req *demouser.CreateUs
 
     resp.BaseResp = pack.BuildBaseResp(errno.Success)
     return resp, nil
-    return  // [!code --]
+}
+```
+
+:::
+
+#### Service
+
+1. Query user to check user exists or not(use `db.QueryUser`)
+2. Encrypt password
+3. Create user(use `db.CreateUser`)
+
+::: code-group
+
+```go [check user]
+// Query user to check user exists or not
+users, err := db.QueryUser(s.ctx, req.Username)
+if err != nil {
+    return err
+}
+if len(users) != 0 {
+    return errno.UserAlreadyExistErr
+}
+```
+
+```go [Encrypt password]
+// Encrypt password
+hasher := md5.New()
+if _, err = io.WriteString(hasher, req.Password); err != nil {
+    return err
+}
+password := fmt.Sprintf("%x", hasher.Sum(nil))
+```
+
+```go [Create user]
+// Create user
+return db.CreateUser(s.ctx, []*db.User{{
+    Username: req.Username,
+    Password: password,
+}})
+```
+
+```go [user/service/create_user]
+// CreateUser create user info.
+func (s *CreateUserService) CreateUser(req *demouser.CreateUserRequest) error {
+    // Query user to check user exists or not
+    users, err := db.QueryUser(s.ctx, req.Username)
+    if err != nil {
+        return err
+    }
+    if len(users) != 0 {
+        return errno.UserAlreadyExistErr
+    }
+
+    // Encrypt password
+    hasher := md5.New()
+    if _, err = io.WriteString(hasher, req.Password); err != nil {
+        return err
+    }
+    password := fmt.Sprintf("%x", hasher.Sum(nil))
+
+    // Create user
+    return db.CreateUser(s.ctx, []*db.User{{
+        Username: req.Username,
+        Password: password,
+    }})
+}
+```
+
+:::
+
+#### dal
+
+1. `QueryUser`
+2. `CreateUser`
+
+::: code-group
+
+```go [user/dal/db/user.go]
+// QueryUser query list of user info
+func QueryUser(ctx context.Context, userName string) ([]*User, error) {
+    var users []*User
+    if err := DB.WithContext(ctx).Where("username = ?", userName).Find(&users).Error; err != nil {
+        return nil, err
+    }
+    return users, nil
+}
+```
+
+```go [user/dal/db/user.go]
+// CreateUser create user info
+func CreateUser(ctx context.Context, users []*User) error {
+    return DB.WithContext(ctx).Create(users).Error
 }
 ```
 
