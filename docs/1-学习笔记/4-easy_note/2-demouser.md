@@ -4,7 +4,21 @@
 
 1. 定义注解使用 [`thrift-gen—validator`](https://github.com/cloudwego/thrift-gen-validator) 插件进行结构体校验。
 2. 预先在 thrift IDL 中定义错误码。这样 Kitex 会生成对应的代码，再直接使用即可。
-   1. 再定义一些错误类型与函数，对业务异常进行转换，让错误处理一致化。
+    1. 再定义一些错误类型与函数，对业务异常进行转换，让错误处理一致化。
+
+### idl 生成
+
+```bash
+# root dir
+kitex_gen_user:
+    kitex --thrift-plugin validator -module demo/easy_note idl/user.thrift
+    go mod tidy
+
+# user dir
+kitex_gen_server:
+    kitex --thrift-plugin validator -module demo/easy_note -service demouser -use demo/easy_note/kitex_gen ../../idl/user.thrift
+    go mod tidy
+```
 
 ## 完善错误码
 
@@ -98,44 +112,46 @@ func baseResp(err errno.ErrNo) *demouser.BaseResp {
 package main
 
 import (
-	demouser "demo/easy_note/kitex_gen/demouser/userservice"
-	"demo/easy_note/pkg/consts"
-	"net"
+    demouser "demo/easy_note/kitex_gen/demouser/userservice"
+    "demo/easy_note/pkg/consts"
+    "net"
 
-	"github.com/cloudwego/kitex/pkg/klog"
-	"github.com/cloudwego/kitex/pkg/limit"
-	"github.com/cloudwego/kitex/server"
-	kitexlogrus "github.com/kitex-contrib/obs-opentelemetry/logging/logrus"
+    "github.com/cloudwego/kitex/pkg/klog"
+    "github.com/cloudwego/kitex/pkg/limit"
+    "github.com/cloudwego/kitex/server"
+    kitexlogrus "github.com/kitex-contrib/obs-opentelemetry/logging/logrus"
 )
 
 func Init() {
-	klog.SetLogger(kitexlogrus.NewLogger())
-	klog.SetLevel(klog.LevelInfo)
+    klog.SetLogger(kitexlogrus.NewLogger())
+    klog.SetLevel(klog.LevelInfo)
 }
 
 func main() {
-	Init()
+    Init()
 
-	addr, err := net.ResolveTCPAddr(consts.Network, consts.UserServiceAddr)
-	if err != nil {
-		panic(err)
-	}
+    addr, err := net.ResolveTCPAddr(consts.Network, consts.UserServiceAddr)
+    if err != nil {
+        panic(err)
+    }
 
-	svr := demouser.NewServer(new(UserServiceImpl),
-		server.WithServiceAddr(addr),
-		server.WithLimit(&limit.Option{MaxConnections: 1000, MaxQPS: 100}),
-		server.WithMuxTransport(),
-	)
+    svr := demouser.NewServer(new(UserServiceImpl),
+        server.WithServiceAddr(addr),
+        server.WithLimit(&limit.Option{MaxConnections: 1000, MaxQPS: 100}),
+        server.WithMuxTransport(),
+    )
 
-	err = svr.Run()
+    err = svr.Run()
 
-	if err != nil {
-		klog.Fatal(err)
-	}
+    if err != nil {
+        klog.Fatal(err)
+    }
 }
 ```
 
-## dal 准备工作
+## 准备工作
+
+### dal 准备工作
 
 ::: code-group
 
@@ -268,20 +284,39 @@ func Users(us []*db.User) []*demouser.User {
 ```yaml [docker-compose.yaml]
 version: "3.7"
 services:
-  # MySQL
-  mysql:
-    image: mysql:latest
-    ports:
-      - "3306:3306"
-    environment:
-      - MYSQL_DATABASE=gorm
-      - MYSQL_USER=gorm
-      - MYSQL_PASSWORD=gorm
-      - MYSQL_RANDOM_ROOT_PASSWORD="yes"
+    # MySQL
+    mysql:
+        image: mysql:latest
+        ports:
+            - "3306:3306"
+        environment:
+            - MYSQL_DATABASE=gorm
+            - MYSQL_USER=gorm
+            - MYSQL_PASSWORD=gorm
+            - MYSQL_RANDOM_ROOT_PASSWORD="yes"
 ```
 
 ```bash [启动]
 docker-compose up -d
+```
+
+:::
+
+### service 准备工作
+
+以 `service/create_user.go` 举例
+
+::: code-group
+
+```go [user/service/create_user.go]
+type CreateUserService struct {
+    ctx context.Context
+}
+
+// NewCreateUserService new CreateUserService
+func NewCreateUserService(ctx context.Context) *CreateUserService {
+    return &CreateUserService{ctx: ctx}
+}
 ```
 
 :::
@@ -455,6 +490,71 @@ func QueryUser(ctx context.Context, userName string) ([]*User, error) {
 func CreateUser(ctx context.Context, users []*User) error {
     return DB.WithContext(ctx).Create(users).Error
 }
+```
+
+:::
+
+## etcd 服务注册
+
+::: code-group
+
+```go [pkg/consts/consts.go]
+package consts
+
+const (
+    ETCDAddress     = "127.0.0.1:2379"
+)
+```
+
+```yaml [docker-compose]
+version: "3.7"
+services:
+    # MySQL
+    # ...
+    # ETCD
+    Etcd:
+        image: "bitnami/etcd:latest"
+        environment:
+            - ALLOW_NONE_AUTHENTICATION=yes
+            - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
+        ports:
+            - "2379:2379"
+            - "2380:2380"
+```
+
+```go [main.go]
+func main() {
+    Init()
+
+    addr, err := net.ResolveTCPAddr(consts.Network, consts.UserServiceAddr)
+    if err != nil {
+        panic(err)
+    }
+
+    r, err := etcd.NewEtcdRegistry([]string{consts.ETCDAddress})    // [!code ++:4]
+    if err != nil {
+        panic(err)
+    }
+
+    svr := demouser.NewServer(new(UserServiceImpl),
+        server.WithServiceAddr(addr),
+        server.WithRegistry(r), // [!code ++:2]
+        server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: consts.UserServiceName}),
+        server.WithLimit(&limit.Option{MaxConnections: 1000, MaxQPS: 100}),
+        server.WithMuxTransport(),
+    )
+
+    err = svr.Run()
+
+    if err != nil {
+        klog.Fatal(err)
+    }
+}
+```
+
+```bash
+docker-compose up -d
+cd cmd/user && make run
 ```
 
 :::
