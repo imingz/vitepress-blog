@@ -83,3 +83,114 @@ func CreateUser(ctx context.Context, req *demouser.CreateUserRequest) error {
 ```
 
 :::
+
+## 编写 idl 和 生成
+
+::: code-group
+
+```[idl/api.thrift]
+namespace go demoapi
+
+struct BaseResp {
+    1: i64 status_code,
+    2: string status_message,
+    3: i64 service_time,
+}
+
+struct User {
+    1: i64 user_id,
+    2: string username,
+    3: string avatar,
+}
+
+struct CreateUserRequest {
+    1: string username (api.form = "username", api.vd = "len($) > 0"),
+    2: string password (api.form = "password", api.vd = "len($) > 0"),
+}
+
+struct CreateUserResponse {
+    1: BaseResp base_resp,
+}
+
+service UserService {
+    CreateUserResponse CreateUser(1: CreateUserRequest req) (api.post = "/v1/user/register"),
+}
+```
+
+```Makefile [Makefile]
+hertz_gen_model:
+    hz model --idl=idl/api.thrift --mod=demo/easy_note --model_dir=hertz_gen
+    go mod tidy
+```
+
+```Makefile [api/Makefile]
+hertz_new_api:
+    hz new --idl=../../idl/api.thrift --service=hello.api -use=demo/easy_note/hertz_gen
+    hertz_gen
+
+hertz_update_api:
+    hz update --idl=../../idl/api.thrift -use=demo/easy_note/hertz_gen
+```
+
+:::
+
+## pack response
+
+::: warning 疑问
+为啥不使用 idl 定义的返回，或者说使用 idl 定义的返回作为 data 部分呢
+:::
+
+::: code-group
+
+```go [api/biz/pack/SendResponse.go]
+package pack
+
+type Response struct {
+    Code    int64       `json:"code"`
+    Message string      `json:"message"`
+    Data    interface{} `json:"data"`
+}
+
+// SendResponse pack response
+func SendResponse(c *app.RequestContext, err error, data interface{}) {
+    Err := errno.ConvertErr(err)
+    c.JSON(consts.StatusOK, Response{
+        Code:    Err.ErrCode,
+        Message: Err.ErrMsg,
+        Data:    data,
+    })
+}
+```
+
+:::
+
+## create user
+
+::: code-group
+
+```go [api/biz/handler/demoapi/user_service.go]
+// CreateUser .
+// @router /v1/user/register [POST]
+func CreateUser(ctx context.Context, c *app.RequestContext) {
+    var err error
+    var req demoapi.CreateUserRequest
+    err = c.BindAndValidate(&req)
+    if err != nil {
+        pack.SendResponse(c, errno.ConvertErr(err), nil)
+        return
+    }
+
+    err = rpc.CreateUser(context.Background(), &demouser.CreateUserRequest{
+        Username: req.Username,
+        Password: req.Password,
+    })
+
+    if err != nil {
+        pack.SendResponse(c, errno.ConvertErr(err), nil)
+        return
+    }
+    pack.SendResponse(c, errno.Success, nil)
+}
+```
+
+:::
