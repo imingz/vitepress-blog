@@ -323,9 +323,9 @@ func NewCreateUserService(ctx context.Context) *CreateUserService {
 
 ## 开发 Handler
 
-### create_user
+### create user
 
-#### dandler
+#### handler
 
 业务流程梳理
 
@@ -489,6 +489,92 @@ func QueryUser(ctx context.Context, userName string) ([]*User, error) {
 // CreateUser create user info
 func CreateUser(ctx context.Context, users []*User) error {
     return DB.WithContext(ctx).Create(users).Error
+}
+```
+
+:::
+
+### check user
+
+#### handler
+
+use `service` `CheckUser()`
+
+::: code-group
+
+```txt [idl/user.thrift]
+struct CheckUserRequest {
+    1: string username (vt.min_size = "1"),
+    2: string password (vt.min_size = "1"),
+}
+
+struct CheckUserResponse {
+    1: i64 user_id,
+    2: BaseResp base_resp,
+}
+
+service UserService {
+    CheckUserResponse CheckUser(1: CheckUserRequest req),
+}
+```
+
+```Makefile [user/Makefile]
+kitex_gen_server:
+    kitex --thrift-plugin validator -module demo/easy_note/user -service demouser -use demo/easy_note/kitex_gen ../../idl/user.thrift
+    go mod tidy
+```
+
+```go [user/handler.go]
+// CheckUser implements the UserServiceImpl interface.
+func (s *UserServiceImpl) CheckUser(ctx context.Context, req *demouser.CheckUserRequest) (resp *demouser.CheckUserResponse, err error) {
+    resp = new(demouser.CheckUserResponse)
+
+    if err = req.IsValid(); err != nil {
+        resp.BaseResp = pack.BuildBaseResp(errno.ParamErr)
+        return resp, nil
+    }
+
+    uid, err := service.NewCheckUserService(ctx).CheckUser(req)
+    if err != nil {
+        resp.BaseResp = pack.BuildBaseResp(err)
+        return resp, nil
+    }
+
+    resp.UserId = uid
+    resp.BaseResp = pack.BuildBaseResp(errno.Success)
+    return resp, nil
+}
+```
+
+:::
+
+#### service
+
+::: code-group
+
+```go [user/service/check_user.go]
+// CheckUser 根据用户名和密码验证用户是否存在
+func (s *CheckUserService) CheckUser(req *demouser.CheckUserRequest) (int64, error) {
+    // 对密码进行MD5加密
+    hasher := md5.New()
+    if _, err := io.WriteString(hasher, req.Password); err != nil {
+        return 0, err
+    }
+    pwd := fmt.Sprintf("%x", hasher.Sum(nil))
+
+    // 查询用户
+    users, err := db.QueryUser(s.ctx, req.Username)
+    if err != nil {
+        return 0, err
+    }
+    if len(users) == 0 {
+        return 0, errno.UserNotExistErr
+    }
+    u := users[0]
+    if pwd != u.Password {
+        return 0, errno.PasswordErr
+    }
+    return int64(u.ID), nil
 }
 ```
 
