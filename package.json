@@ -1,33 +1,33 @@
 {
-  "name": "vitepress-blog",
-  "version": "1.0.0",
-  "type": "module",
-  "main": "index.js",
-  "repository": "https://github.com/imingz/vitepress-blog.git",
-  "author": "imimgz <imingz@qq.com>",
-  "license": "MIT",
-  "devDependencies": {
-    "@documate/documate": "latest",
-    "@mdit-vue/shared": "^0.12.0",
-    "@types/markdown-it-footnote": "^3.0.0",
-    "@types/node": "^20.4.9",
-    "@vercel/analytics": "^1.0.2",
-    "axios": "^1.4.0",
-    "element-plus": "^2.3.9",
-    "fast-glob": "^3.3.1",
-    "gray-matter": "^4.0.3",
-    "markdown-it-custom-attrs": "^1.0.2",
-    "markdown-it-footnote": "^3.0.3",
-    "markdown-it-mathjax3": "^4.3.2",
-    "markdown-it-task-lists": "^2.1.1",
-    "sass": "^1.65.1",
-    "vitepress": "^1.0.0-rc.20",
-    "@documate/vue": "latest"
-  },
-  "scripts": {
-    "dev": "vitepress dev docs",
-    "build": "vitepress build docs",
-    "preview": "vitepress preview docs",
-    "documate:upload": "documate upload"
-  }
+    "name": "vitepress-blog",
+    "version": "1.0.0",
+    "type": "module",
+    "main": "index.js",
+    "repository": "https://github.com/imingz/vitepress-blog.git",
+    "author": "imimgz <imingz@qq.com>",
+    "license": "MIT",
+    "devDependencies": {
+        "@documate/documate": "latest",
+        "@mdit-vue/shared": "^0.12.0",
+        "@types/markdown-it-footnote": "^3.0.0",
+        "@types/node": "^20.4.9",
+        "@vercel/analytics": "^1.0.2",
+        "axios": "^1.5.1",
+        "element-plus": "^2.3.9",
+        "fast-glob": "^3.3.1",
+        "gray-matter": "^4.0.3",
+        "lodash-es": "^4.17.21",
+        "markdown-it-custom-attrs": "^1.0.2",
+        "markdown-it-footnote": "^3.0.3",
+        "markdown-it-mathjax3": "^4.3.2",
+        "markdown-it-task-lists": "^2.1.1",
+        "sass": "^1.65.1",
+        "vitepress": "^1.0.0-rc.20"
+    },
+    "scripts": {
+        "dev": "vitepress dev docs",
+        "build": "vitepress build docs",
+        "preview": "vitepress preview docs",
+        "documate:upload": "documate upload"
+    }
 }
