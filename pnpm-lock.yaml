@@ -18,8 +18,11 @@ devDependencies:
     specifier: ^3.0.0
     version: 3.0.1
   '@types/node':
-    specifier: ^20.4.9
+    specifier: ^20.8.3
     version: 20.8.3
+  '@types/vue':
+    specifier: ^2.0.0
+    version: 2.0.0
   '@vercel/analytics':
     specifier: ^1.0.2
     version: 1.1.0
@@ -59,6 +62,9 @@ devDependencies:
   vitepress:
     specifier: ^1.0.0-rc.21
     version: 1.0.0-rc.21(@algolia/client-search@4.20.0)(@types/node@20.8.3)(axios@1.5.1)(markdown-it-mathjax3@4.3.2)(postcss@8.4.31)(sass@1.69.0)(search-insights@2.8.3)
+  vue:
+    specifier: ^3.3.4
+    version: 3.3.4
 
 packages:
 
@@ -667,6 +673,13 @@ packages:
 
   /@types/node@20.8.3:
     resolution: {integrity: sha512-jxiZQFpb+NlH5kjW49vXxvxTjeeqlbsnTAdBTKpzEdPs9itay7MscYXz3Fo9VYFEsfQ6LJFitHad3faerLAjCw==}
+    dev: true
+
+  /@types/vue@2.0.0:
+    resolution: {integrity: sha512-WDElkBv/o4lVwu6wYHB06AXs4Xo2fwDjJUpvPRc1QQdzkUSiGFjrYuSCy8raxLE5FObgKq8ND7R5gSZTFLK60w==}
+    deprecated: This is a stub types definition for vuejs (https://github.com/vuejs/vue). vuejs provides its own type definitions, so you don't need @types/vue installed!
+    dependencies:
+      vue: 3.3.4
     dev: true
 
   /@types/web-bluetooth@0.0.16:
