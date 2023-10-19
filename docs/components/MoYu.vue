@@ -2,7 +2,6 @@
 import { ref, onMounted, Ref } from "vue";
 import service from "./utils/request";
 import { ElNotification } from "element-plus";
-import { da } from "element-plus/es/locale";
 
 interface Payday {
     paydayTime: number;
